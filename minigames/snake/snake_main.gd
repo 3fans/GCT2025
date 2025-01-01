@@ -33,8 +33,7 @@ func _ready():
 	new_game()
 	
 func new_game():
-	print(Coordinator.get_root(self).get_child(0))
-	Coordinator.get_root(self).get_child(0).get_tree().call_group("segments", "queue_free")
+	self.get_tree().call_group("segments", "queue_free")
 	$GameOverMenu.hide()
 	score = 0
 	$Hud.get_node("ScoreLabel").text = "SCORE: " + str(score)
