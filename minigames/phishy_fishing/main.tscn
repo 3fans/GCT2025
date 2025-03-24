@@ -1,0 +1,124 @@
+[gd_scene load_steps=12 format=3 uid="uid://cbnct3aa45gn7"]
+
+[ext_resource type="Script" uid="uid://c26eptfcb6703" path="res://minigames/phishy_fishing/player.gd" id="1_jfwp8"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_xk2gi"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_jfwp8"]
+sky_material = SubResource("ProceduralSkyMaterial_xk2gi")
+
+[sub_resource type="Environment" id="Environment_wkrex"]
+background_mode = 2
+sky = SubResource("Sky_jfwp8")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xk2gi"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_jfwp8"]
+
+[sub_resource type="Animation" id="Animation_jfwp8"]
+resource_name = "new_animation"
+
+[sub_resource type="Animation" id="Animation_wkrex"]
+resource_name = "rod_cast"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RodPivot:rotation:x")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.366667, 0.566667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.497419, 0.916298, 0.497419]
+}
+
+[sub_resource type="Animation" id="Animation_ek0ys"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RodPivot:rotation:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.497419]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lylvw"]
+_data = {
+&"RESET": SubResource("Animation_ek0ys"),
+&"new_animation": SubResource("Animation_jfwp8"),
+&"rod_cast": SubResource("Animation_wkrex")
+}
+
+[sub_resource type="BoxMesh" id="BoxMesh_jfwp8"]
+size = Vector3(0.2, 0.2, 3.025)
+
+[node name="FishingMain" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_wkrex")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.59016, 11)
+script = ExtResource("1_jfwp8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_xk2gi")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("CapsuleMesh_jfwp8")
+metadata/_edit_group_ = true
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.381899, 0)
+fov = 97.2906
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+libraries = {
+&"": SubResource("AnimationLibrary_lylvw")
+}
+
+[node name="RodPivot" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 0.878817, -0.477159, 0, 0.477159, 0.878817, 0.649385, 0.029634, 0.0466995)
+
+[node name="Rod" type="MeshInstance3D" parent="Player/RodPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0349131, 0, -1.33328)
+mesh = SubResource("BoxMesh_jfwp8")
+skeleton = NodePath("../..")
+
+[node name="Pond" type="CSGCombiner3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+use_collision = true
+
+[node name="Land" type="CSGCylinder3D" parent="Pond"]
+radius = 20.0
+height = 10.0
+
+[node name="Cutout" type="CSGCylinder3D" parent="Pond"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.05486, 0)
+operation = 2
+radius = 10.0
+height = 13.75
+
+[node name="DontWalkInPondCollision" type="CSGCombiner3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+visible = false
+use_collision = true
+
+[node name="Cutout" type="CSGCylinder3D" parent="DontWalkInPondCollision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.05486, 0)
+radius = 10.0
+height = 13.75
