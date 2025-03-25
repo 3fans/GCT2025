@@ -82,4 +82,5 @@ toggle_inventory={
 
 2d_physics/layer_1="Main"
 2d_physics/layer_2="Light"
+3d_physics/layer_2="Water"
 2d_physics/layer_3="TestCollision"

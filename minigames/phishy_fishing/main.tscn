@@ -1,6 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://cbnct3aa45gn7"]
+[gd_scene load_steps=24 format=3 uid="uid://cbnct3aa45gn7"]
 
 [ext_resource type="Script" uid="uid://c26eptfcb6703" path="res://minigames/phishy_fishing/player.gd" id="1_jfwp8"]
+[ext_resource type="Script" uid="uid://u0jjsc0q0qc0" path="res://minigames/phishy_fishing/water_area.gd" id="2_ek0ys"]
+[ext_resource type="Shader" uid="uid://dvj8ct2ojrauk" path="res://minigames/phishy_fishing/water_shader.gdshader" id="2_wkrex"]
+[ext_resource type="Script" uid="uid://bo06rfmdh7bf3" path="res://minigames/phishy_fishing/fish.gd" id="4_lylvw"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_xk2gi"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -19,24 +22,6 @@ glow_enabled = true
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_jfwp8"]
 
-[sub_resource type="Animation" id="Animation_jfwp8"]
-resource_name = "new_animation"
-
-[sub_resource type="Animation" id="Animation_wkrex"]
-resource_name = "rod_cast"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("RodPivot:rotation:x")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.366667, 0.566667),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [0.497419, 0.916298, 0.497419]
-}
-
 [sub_resource type="Animation" id="Animation_ek0ys"]
 length = 0.001
 tracks/0/type = "value"
@@ -52,6 +37,25 @@ tracks/0/keys = {
 "values": [0.497419]
 }
 
+[sub_resource type="Animation" id="Animation_jfwp8"]
+resource_name = "new_animation"
+
+[sub_resource type="Animation" id="Animation_wkrex"]
+resource_name = "rod_cast"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RodPivot:rotation:x")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.497419, 0.916298, 0.497419]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_lylvw"]
 _data = {
 &"RESET": SubResource("Animation_ek0ys"),
@@ -59,8 +63,59 @@ _data = {
 &"rod_cast": SubResource("Animation_wkrex")
 }
 
-[sub_resource type="BoxMesh" id="BoxMesh_jfwp8"]
-size = Vector3(0.2, 0.2, 3.025)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wkrex"]
+albedo_color = Color(0.48, 0.48, 0.48, 1)
+metallic = 1.0
+metallic_specular = 1.0
+roughness = 0.15
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wkrex"]
+material = SubResource("StandardMaterial3D_wkrex")
+top_radius = 0.2
+bottom_radius = 0.2
+height = 3.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ek0ys"]
+radius = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lylvw"]
+albedo_color = Color(1, 0.04, 0.04, 1)
+roughness = 0.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_8r1gv"]
+material = SubResource("StandardMaterial3D_lylvw")
+radius = 0.2
+height = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lylvw"]
+render_priority = 0
+shader = ExtResource("2_wkrex")
+shader_parameter/depth_fade_distance = 1.0
+shader_parameter/absorbance = 2.0
+shader_parameter/shallow_color = Color(0.22, 0.66, 1, 1)
+shader_parameter/deep_color = Color(0, 0.25, 0.45, 1)
+shader_parameter/foam_amount = 0.2
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/roughness = 0.05
+shader_parameter/wave_scale = 4.0
+shader_parameter/height_scale = 0.15
+shader_parameter/wave_dir1 = Vector2(1, 0)
+shader_parameter/wave_dir2 = Vector2(0, 1)
+shader_parameter/wave_speed = 0.015
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_8r1gv"]
+material = SubResource("ShaderMaterial_lylvw")
+top_radius = 10.0
+bottom_radius = 10.0
+height = 5.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_vr4f8"]
+height = 5.0
+radius = 11.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8r1gv"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vr4f8"]
 
 [node name="FishingMain" type="Node3D"]
 
@@ -73,6 +128,7 @@ shadow_enabled = true
 
 [node name="Player" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.59016, 11)
+collision_mask = 5
 script = ExtResource("1_jfwp8")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
@@ -95,9 +151,23 @@ libraries = {
 transform = Transform3D(1, 0, 0, 0, 0.878817, -0.477159, 0, 0.477159, 0.878817, 0.649385, 0.029634, 0.0466995)
 
 [node name="Rod" type="MeshInstance3D" parent="Player/RodPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0349131, 0, -1.33328)
-mesh = SubResource("BoxMesh_jfwp8")
+transform = Transform3D(1, 0, 0, 0, -2.98023e-08, -1, 0, 1, -2.98023e-08, 0.299618, -4.76837e-07, -1.33328)
+mesh = SubResource("CylinderMesh_wkrex")
 skeleton = NodePath("../..")
+
+[node name="BobbleHitch" type="Node3D" parent="Player/RodPivot/Rod"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.19209e-07, -1.46602, 0.493374)
+
+[node name="Bobble" type="RigidBody3D" parent="Player/RodPivot/Rod/BobbleHitch"]
+collision_layer = 3
+freeze = true
+linear_damp = 2.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player/RodPivot/Rod/BobbleHitch/Bobble"]
+shape = SubResource("SphereShape3D_ek0ys")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player/RodPivot/Rod/BobbleHitch/Bobble"]
+mesh = SubResource("SphereMesh_8r1gv")
 
 [node name="Pond" type="CSGCombiner3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
@@ -113,12 +183,42 @@ operation = 2
 radius = 10.0
 height = 13.75
 
+[node name="WaterArea" type="Area3D" parent="Pond"]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("2_ek0ys")
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="Pond/WaterArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.625166, 0)
+use_collision = true
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="Pond/WaterArea/CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.11696, 0)
+mesh = SubResource("CylinderMesh_8r1gv")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pond/WaterArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.681, 0)
+shape = SubResource("CylinderShape3D_vr4f8")
+
 [node name="DontWalkInPondCollision" type="CSGCombiner3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
 visible = false
 use_collision = true
+collision_layer = 4
 
 [node name="Cutout" type="CSGCylinder3D" parent="DontWalkInPondCollision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.05486, 0)
 radius = 10.0
 height = 13.75
+
+[node name="Fish" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -1.185, 0)
+script = ExtResource("4_lylvw")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Fish"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_8r1gv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Fish"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_vr4f8")

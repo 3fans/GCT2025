@@ -1,11 +1,16 @@
 extends CharacterBody3D
 
-
+const CAST_TIME := 0.6
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
-
 const MOUSE_SENSE = 0.005
+const BOBBLE_SPEED := 10
 
+
+@onready var bobble = $RodPivot/Rod/BobbleHitch/Bobble
+@onready var bobble_hitch = $RodPivot/Rod/BobbleHitch
+
+var isCast = false
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
@@ -15,7 +20,11 @@ func _input(event: InputEvent) -> void:
 		
 	if event is InputEventMouseButton:
 		if event.button_index == 1 && event.pressed:
-			$AnimationPlayer.play("rod_cast")
+			if isCast:
+				reel_in()
+			else:
+				cast_rod()
+			isCast = !isCast
 
 func _physics_process(delta: float) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -41,5 +50,20 @@ func _physics_process(delta: float) -> void:
 		
 	move_and_slide()
 
+
 func cast_rod() -> void:
 	$AnimationPlayer.play("rod_cast")
+	await get_tree().create_timer(CAST_TIME)
+	throw_bobble()
+
+func throw_bobble() -> void:
+	bobble.freeze = false
+	bobble.reparent(Coordinator.current_scene(self))
+	bobble.set_axis_velocity(-bobble.basis.y * BOBBLE_SPEED	)
+
+	
+func reel_in() -> void:
+	bobble.reparent(bobble_hitch)
+	bobble.transform = Transform3D()
+	bobble.freeze = true
+	pass
